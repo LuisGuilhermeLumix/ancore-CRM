@@ -9,6 +9,7 @@ function parseDollar(val: any): number {
 }
 
 export interface DashboardMetrics {
+  carrinhosAbandonados: number
   disparosFeitos: { total: number; sms: number; email: number }
   vendasRecuperadas: { total: number; sms: number; email: number }
   taxaConversao: { total: number; sms: number; email: number }
@@ -19,6 +20,7 @@ export interface DashboardMetrics {
 }
 
 const zero: DashboardMetrics = {
+  carrinhosAbandonados: 0,
   disparosFeitos: { total: 0, sms: 0, email: 0 },
   vendasRecuperadas: { total: 0, sms: 0, email: 0 },
   taxaConversao: { total: 0, sms: 0, email: 0 },
@@ -43,6 +45,13 @@ export function useMetrics() {
       try {
         const from = `${dateFrom}T00:00:00.000Z`
         const to   = `${dateTo}T23:59:59.999Z`
+
+        // Carrinhos abandonados — apenas primeiro disparo SMS (evita duplicidade)
+        const cartPromise = supabase
+          .from('tailgrab_nutra_eua_CRM')
+          .select('id', { count: 'exact', head: true })
+          .gte('created_at', from).lte('created_at', to)
+          .eq('Event', 'abandoned_cart_01_SMS')
 
         const smsDisparosPromise = channel !== 'Email'
           ? supabase
@@ -74,7 +83,8 @@ export function useMetrics() {
           .eq('Event', 'order_paid')
           .eq('utm_source', 'FRONT')
 
-        const [smsDisRes, emailDisRes, salesRes, frontRes] = await Promise.all([
+        const [cartRes, smsDisRes, emailDisRes, salesRes, frontRes] = await Promise.all([
+          cartPromise,
           smsDisparosPromise,
           emailDisparosPromise,
           salesPromise,
@@ -85,6 +95,7 @@ export function useMetrics() {
 
         if (cancelled) return
 
+        const carrinhosAbandonados = (cartRes as any).count ?? 0
         const smsDisparos   = (smsDisRes as any).count ?? 0
         const emailDisparos = (emailDisRes as any).count ?? 0
         const totalDisparos = smsDisparos + emailDisparos
@@ -116,6 +127,7 @@ export function useMetrics() {
         const faturamentoPct = frontTotal > 0 ? (totalReceita / frontTotal) * 100 : 0
 
         setMetrics({
+          carrinhosAbandonados,
           disparosFeitos:    { total: totalDisparos, sms: smsDisparos,   email: emailDisparos },
           vendasRecuperadas: { total: totalVendas,   sms: smsVendas,     email: emailVendas   },
           taxaConversao:     { total: taxaTotal,     sms: taxaSms,       email: taxaEmail     },

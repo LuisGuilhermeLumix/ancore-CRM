@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Send, TrendingUp, Target, Receipt, DollarSign, Wallet } from "lucide-react";
+import { Send, TrendingUp, Target, Receipt, DollarSign, Wallet, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { MetricCard } from "@/components/MetricCard";
@@ -26,7 +26,14 @@ function DashboardPage() {
   return (
     <AppLayout title="Dashboard">
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+          <MetricCard
+            label="Carrinhos Abandonados"
+            icon={ShoppingCart}
+            loading={loading}
+            value={formatNumber(m.carrinhosAbandonados)}
+            subInfo="Leads únicos no período"
+          />
           <MetricCard
             label="Disparos Feitos"
             icon={Send}
