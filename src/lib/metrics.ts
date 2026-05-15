@@ -69,7 +69,18 @@ export function calcComissaoLumix(valorRecuperado: number): number {
   return valorRecuperado * COMMISSION_RATE
 }
 
-export function calcFaturamentoFront(valorRecuperado: number, faturamentoTotal: number): number {
-  if (!faturamentoTotal) return 0
-  return (valorRecuperado / faturamentoTotal) * 100
+export function calcFaturamentoFront(rows: CRMRow[]): number {
+  return rows
+    .filter(
+      (r) =>
+        r.Event === 'order_paid' &&
+        !(r.utm_source?.toUpperCase().includes('WPP') ?? false),
+    )
+    .reduce((acc, r) => acc + parseNum(r['($)']), 0)
+}
+
+export function calcFaturamentoSobFront(valorRecuperado: number, faturamentoFront: number): number {
+  const total = valorRecuperado + faturamentoFront
+  if (!total) return 0
+  return (valorRecuperado / total) * 100
 }

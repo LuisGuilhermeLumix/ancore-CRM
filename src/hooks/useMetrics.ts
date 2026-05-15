@@ -12,21 +12,11 @@ import {
   calcValorRecuperado,
   calcComissaoLumix,
   calcFaturamentoFront,
+  calcFaturamentoSobFront,
   CRMRow,
 } from '@/lib/metrics'
 
 const TABLE = 'obliviumdigital_nutra_br_CRM'
-
-function parseNum(val: any): number {
-  if (val === null || val === undefined || val === '') return 0
-  if (typeof val === 'number') return isNaN(val) ? 0 : val
-  let s = String(val).replace(/[^0-9.,\-]/g, '')
-  if (s.includes(',')) {
-    s = s.replace(/\./g, '').replace(',', '.')
-  }
-  const n = parseFloat(s)
-  return isNaN(n) ? 0 : n
-}
 
 export interface DashboardMetrics {
   carrinhosAbandonados: number
@@ -36,6 +26,7 @@ export interface DashboardMetrics {
   taxaConversao: number
   ticketMedio: number
   valorRecuperado: number
+  faturamentoFront: number
   comissaoLumix: number
   faturamentoSobFrontPct: number
 }
@@ -48,6 +39,7 @@ const zero: DashboardMetrics = {
   taxaConversao: 0,
   ticketMedio: 0,
   valorRecuperado: 0,
+  faturamentoFront: 0,
   comissaoLumix: 0,
   faturamentoSobFrontPct: 0,
 }
@@ -77,13 +69,7 @@ export function useMetrics() {
           .lte('created_at', to)
         if (productFilter) q = q.eq('product', productFilter)
 
-        const cfgPromise = supabase
-          .from('crm_config')
-          .select('total_revenue_usd')
-          .eq('id', 1)
-          .maybeSingle()
-
-        const [rowsRes, cfgRes] = await Promise.all([q, cfgPromise])
+        const rowsRes = await q
 
         if ((rowsRes as any).error) throw (rowsRes as any).error
         if (cancelled) return
@@ -97,11 +83,9 @@ export function useMetrics() {
         const taxaConversao = calcConversionRate(vendasRecuperadas, carrinhosAbandonados)
         const ticketMedio = calcTicketMedio(rows)
         const valorRecuperado = calcValorRecuperado(rows)
+        const faturamentoFront = calcFaturamentoFront(rows)
         const comissaoLumix = calcComissaoLumix(valorRecuperado)
-
-        const cfg = (cfgRes as any).data
-        const faturamentoTotal = parseNum(cfg?.total_revenue_usd)
-        const faturamentoSobFrontPct = calcFaturamentoFront(valorRecuperado, faturamentoTotal)
+        const faturamentoSobFrontPct = calcFaturamentoSobFront(valorRecuperado, faturamentoFront)
 
         setMetrics({
           carrinhosAbandonados,
@@ -111,6 +95,7 @@ export function useMetrics() {
           taxaConversao,
           ticketMedio,
           valorRecuperado,
+          faturamentoFront,
           comissaoLumix,
           faturamentoSobFrontPct,
         })

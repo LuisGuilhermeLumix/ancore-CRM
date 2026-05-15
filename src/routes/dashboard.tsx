@@ -9,13 +9,12 @@ import {
   ShoppingCart,
   MessageCircle,
   Send,
+  Store,
 } from "lucide-react";
-import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { MetricCard } from "@/components/MetricCard";
 import { RecoveryChart } from "@/components/RecoveryChart";
 import { LeadsTable } from "@/components/LeadsTable";
-import { CostsModal } from "@/components/CostsModal";
 import { useMetrics } from "@/hooks/useMetrics";
 import { formatCurrency, formatNumber, formatPercent } from "@/lib/format";
 
@@ -30,8 +29,6 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardPage() {
-  const [costsOpen, setCostsOpen] = useState(false);
-  const [reloadKey, setReloadKey] = useState(0);
   const { metrics: m, loading } = useMetrics();
 
   return (
@@ -73,7 +70,7 @@ function DashboardPage() {
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
           <MetricCard
             label="Ticket Médio"
             icon={Receipt}
@@ -86,6 +83,13 @@ function DashboardPage() {
             variant="success"
             loading={loading}
             value={formatCurrency(m.valorRecuperado)}
+          />
+          <MetricCard
+            label="Faturamento Total (Front)"
+            icon={Store}
+            variant="brand"
+            loading={loading}
+            value={formatCurrency(m.faturamentoFront)}
           />
           <MetricCard
             label="Comissão Lumix"
@@ -102,21 +106,12 @@ function DashboardPage() {
             loading={loading}
             value={formatPercent(m.faturamentoSobFrontPct, 1)}
             subInfo="Recuperado vs. faturamento total"
-            editable
-            onEdit={() => setCostsOpen(true)}
           />
         </div>
 
         <RecoveryChart />
         <LeadsTable />
       </div>
-
-      <CostsModal
-        key={reloadKey}
-        open={costsOpen}
-        onClose={() => setCostsOpen(false)}
-        onSaved={() => setReloadKey((k) => k + 1)}
-      />
     </AppLayout>
   );
 }
