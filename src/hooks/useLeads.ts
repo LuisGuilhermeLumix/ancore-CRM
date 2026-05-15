@@ -48,7 +48,7 @@ export function useLeads(search: string, page: number) {
           .gte('created_at', from)
           .lte('created_at', to)
           .eq('Event', 'order_paid')
-          .eq('utm_source', 'WPP')
+          .ilike('utm_source', '%WPP%')
           .order('created_at', { ascending: false })
           .limit(50)
 

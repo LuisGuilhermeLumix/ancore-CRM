@@ -37,7 +37,7 @@ export function useChartData() {
           .gte('created_at', startOfDayUTC(dateFrom))
           .lte('created_at', endOfDayUTC(dateTo))
           .eq('Event', 'order_paid')
-          .eq('utm_source', 'WPP')
+          .ilike('utm_source', '%WPP%')
 
         if (product && product !== 'Todos') q = q.eq('product', product)
 

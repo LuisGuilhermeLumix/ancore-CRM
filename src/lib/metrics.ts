@@ -44,7 +44,7 @@ export function calcResponseRate(rows: CRMRow[]): number {
 }
 
 export function calcRecoveredSales(rows: CRMRow[]): number {
-  return rows.filter((r) => r.Event === 'order_paid' && r.utm_source === 'WPP').length
+  return rows.filter((r) => r.Event === 'order_paid' && (r.utm_source?.toUpperCase().includes('WPP') ?? false)).length
 }
 
 export function calcConversionRate(recoveredSales: number, abandonedCarts: number): number {
@@ -53,7 +53,7 @@ export function calcConversionRate(recoveredSales: number, abandonedCarts: numbe
 }
 
 export function calcTicketMedio(rows: CRMRow[]): number {
-  const wppSales = rows.filter((r) => r.Event === 'order_paid' && r.utm_source === 'WPP')
+  const wppSales = rows.filter((r) => r.Event === 'order_paid' && (r.utm_source?.toUpperCase().includes('WPP') ?? false))
   if (!wppSales.length) return 0
   const total = wppSales.reduce((acc, r) => acc + parseNum(r['($)']), 0)
   return total / wppSales.length
@@ -61,7 +61,7 @@ export function calcTicketMedio(rows: CRMRow[]): number {
 
 export function calcValorRecuperado(rows: CRMRow[]): number {
   return rows
-    .filter((r) => r.Event === 'order_paid' && r.utm_source === 'WPP')
+    .filter((r) => r.Event === 'order_paid' && (r.utm_source?.toUpperCase().includes('WPP') ?? false))
     .reduce((acc, r) => acc + parseNum(r['($)']), 0)
 }
 
