@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { useFilters } from './useFilters'
 import { startOfDayUTC, endOfDayUTC, utcToLocalDateStr, getDaysInRange } from '@/lib/dates'
 
-const TABLE = 'obliviumdigital_nutra_br_CRM'
+const TABLE = 'ancore_info_br_CRM'
 
 export interface ChartPoint {
   date: string

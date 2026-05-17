@@ -24,7 +24,7 @@ function CustomTooltip({ active, payload, label }: any) {
       {salesEntry && (
         <div>
           <div className="flex items-center justify-between gap-4">
-            <span style={{ color: "#22c55e" }}>● WPP</span>
+            <span style={{ color: "#22c55e" }}>● Carrinho Abandonado</span>
             <span className="text-white font-semibold">{salesEntry.value} vendas</span>
           </div>
           <div className="flex justify-end">
@@ -61,7 +61,7 @@ export function RecoveryChart() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <LegendDot color="#22c55e" label="WPP" />
+          <LegendDot color="#22c55e" label="Carrinho Abandonado" />
         </div>
       </div>
 

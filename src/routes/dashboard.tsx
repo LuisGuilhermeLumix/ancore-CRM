@@ -8,7 +8,6 @@ import {
   BadgeDollarSign,
   ShoppingCart,
   MessageCircle,
-  Send,
   Store,
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
@@ -21,7 +20,7 @@ import { formatCurrency, formatNumber, formatPercent } from "@/lib/format";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Lumix - Oblivium Digital" },
+      { title: "Dashboard — Lumix - Ancore" },
       { name: "description", content: "Métricas de recuperação de vendas em tempo real." },
     ],
   }),
@@ -34,18 +33,12 @@ function DashboardPage() {
   return (
     <AppLayout title="Dashboard">
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <MetricCard
             label="Carrinhos Abandonados"
             icon={ShoppingCart}
             loading={loading}
             value={formatNumber(m.carrinhosAbandonados)}
-          />
-          <MetricCard
-            label="Disparos Feitos"
-            icon={Send}
-            loading={loading}
-            value={formatNumber(m.disparosFeitos)}
           />
           <MetricCard
             label="Taxa de Resposta"

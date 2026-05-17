@@ -4,7 +4,6 @@ import { useFilters } from './useFilters'
 import { startOfDayUTC, endOfDayUTC } from '@/lib/dates'
 import {
   calcAbandonedCarts,
-  calcDisparosFeitos,
   calcResponseRate,
   calcRecoveredSales,
   calcConversionRate,
@@ -16,11 +15,10 @@ import {
   CRMRow,
 } from '@/lib/metrics'
 
-const TABLE = 'obliviumdigital_nutra_br_CRM'
+const TABLE = 'ancore_info_br_CRM'
 
 export interface DashboardMetrics {
   carrinhosAbandonados: number
-  disparosFeitos: number
   taxaResposta: number
   vendasRecuperadas: number
   taxaConversao: number
@@ -33,7 +31,6 @@ export interface DashboardMetrics {
 
 const zero: DashboardMetrics = {
   carrinhosAbandonados: 0,
-  disparosFeitos: 0,
   taxaResposta: 0,
   vendasRecuperadas: 0,
   taxaConversao: 0,
@@ -64,7 +61,7 @@ export function useMetrics() {
 
         let q = supabase
           .from(TABLE)
-          .select('"Event", utm_source, status, "($)"')
+          .select('id, created_at, "Event", utm_source, status, "($)"')
           .gte('created_at', from)
           .lte('created_at', to)
         if (productFilter) q = q.eq('product', productFilter)
@@ -77,7 +74,6 @@ export function useMetrics() {
         const rows = ((rowsRes as any).data ?? []) as CRMRow[]
 
         const carrinhosAbandonados = calcAbandonedCarts(rows)
-        const disparosFeitos = calcDisparosFeitos(rows)
         const taxaResposta = calcResponseRate(rows)
         const vendasRecuperadas = calcRecoveredSales(rows)
         const taxaConversao = calcConversionRate(vendasRecuperadas, carrinhosAbandonados)
@@ -89,7 +85,6 @@ export function useMetrics() {
 
         setMetrics({
           carrinhosAbandonados,
-          disparosFeitos,
           taxaResposta,
           vendasRecuperadas,
           taxaConversao,

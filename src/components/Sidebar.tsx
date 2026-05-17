@@ -19,8 +19,11 @@ export function Sidebar({ onNavigate }: SidebarProps = {}) {
 
   return (
     <aside className="flex h-full w-full flex-col bg-[#0a0a0a] border-r border-[#141414] px-3 py-5">
-      <div className="px-2 pb-7 mb-2 border-b border-[#1a1a1a] flex items-center">
-        <Logo variant="icon" className="h-20 w-auto object-contain mx-auto" />
+      <div className="px-2 pb-5 mb-2 border-b border-[#1a1a1a] flex flex-col items-center gap-2">
+        <Logo variant="icon" className="h-20 w-auto object-contain" />
+        <span className="text-sm font-semibold text-white tracking-wide">
+          Lumix - Ancore
+        </span>
       </div>
 
       <div className="px-2 mt-2 mb-1.5">

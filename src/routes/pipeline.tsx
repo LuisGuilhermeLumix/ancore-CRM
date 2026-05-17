@@ -6,14 +6,14 @@ import { AppLayout } from "@/components/AppLayout";
 export const Route = createFileRoute("/pipeline")({
   head: () => ({
     meta: [
-      { title: "Pipeline — Lumix - Oblivium Digital" },
+      { title: "Pipeline — Lumix - Ancore" },
       { name: "description", content: "Pipeline de leads de carrinho abandonado." },
     ],
   }),
   component: PipelinePage,
 });
 
-const TABLE = "obliviumdigital_nutra_br_CRM";
+const TABLE = "ancore_info_br_CRM";
 
 interface PipelineLead {
   id: number;
@@ -54,14 +54,13 @@ function getProductColor(product: string): { bg: string; text: string } {
 const COLUMNS: ColumnDef[] = [
   { status: "primeiro_contato",   label: "Primeiro Contato",  color: "#888888", bg: "rgba(136,136,136,0.12)" },
   { status: "em_contato",         label: "Em Contato",        color: "#80d7f8", bg: "rgba(128,215,248,0.12)" },
-  { status: "achou_caro",         label: "Achou Caro",        color: "#f59e0b", bg: "rgba(245,158,11,0.12)" },
-  { status: "sem_dinheiro_agora", label: "Sem Dinheiro Agora",color: "#f97316", bg: "rgba(249,115,22,0.12)" },
-  { status: "duvida_eficacia",    label: "Dúvida Eficácia",   color: "#a78bfa", bg: "rgba(167,139,250,0.12)" },
-  { status: "nao_confia",         label: "Não Confia",        color: "#ef4444", bg: "rgba(239,68,68,0.12)" },
   { status: "link_enviado",       label: "Link Enviado",      color: "#3b82f6", bg: "rgba(59,130,246,0.12)" },
-  { status: "convertido",         label: "Convertido",        color: "#22c55e", bg: "rgba(34,197,94,0.12)" },
+  { status: "link_15",            label: "Link -15%",         color: "#f59e0b", bg: "rgba(245,158,11,0.12)" },
+  { status: "link_20",            label: "Link -20%",         color: "#f97316", bg: "rgba(249,115,22,0.12)" },
+  { status: "sem_dinheiro_agora", label: "Sem Dinheiro Agora",color: "#a78bfa", bg: "rgba(167,139,250,0.12)" },
+  { status: "nao_confia",         label: "Não Confia",        color: "#ef4444", bg: "rgba(239,68,68,0.12)" },
   { status: "desistiu",           label: "Desistiu",          color: "#6b7280", bg: "rgba(107,114,128,0.15)" },
-  { status: "suspeita_robo",      label: "Suspeita de Robô",  color: "#ec4899", bg: "rgba(236,72,153,0.12)" },
+  { status: "convertido",         label: "Convertido",        color: "#22c55e", bg: "rgba(34,197,94,0.12)" },
 ];
 
 function PipelinePage() {
@@ -191,8 +190,14 @@ function LeadCard({ lead }: { lead: PipelineLead }) {
       <div className="text-xs text-[#888] font-mono mt-0.5 truncate">
         {lead.number || "—"}
       </div>
-      {lead.product && (
-        <div className="mt-2">
+      <div className="mt-2 flex flex-wrap gap-1">
+        <span
+          className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap"
+          style={{ backgroundColor: "rgba(34,197,94,0.10)", color: "#22c55e" }}
+        >
+          Carrinho Abandonado
+        </span>
+        {lead.product && (
           <span
             className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium truncate max-w-full"
             style={(() => {
@@ -202,8 +207,8 @@ function LeadCard({ lead }: { lead: PipelineLead }) {
           >
             {lead.product}
           </span>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
