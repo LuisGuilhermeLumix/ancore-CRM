@@ -53,6 +53,11 @@ function getProductColor(product: string): { bg: string; text: string } {
 
 const COLUMNS: ColumnDef[] = [
   { status: "primeiro_contato",   label: "Primeiro Contato",  color: "#888888", bg: "rgba(136,136,136,0.12)" },
+  { status: "respondeu",          label: "Respondeu",         color: "#22c55e", bg: "rgba(34,197,94,0.12)" },
+  { status: "follow_up_01",       label: "Follow-up 01",      color: "#38bdf8", bg: "rgba(56,189,248,0.12)" },
+  { status: "follow_up_02",       label: "Follow-up 02",      color: "#3b82f6", bg: "rgba(59,130,246,0.12)" },
+  { status: "follow_up_03",       label: "Follow-up 03",      color: "#a78bfa", bg: "rgba(167,139,250,0.12)" },
+  { status: "follow_up_04",       label: "Follow-up 04",      color: "#8b5cf6", bg: "rgba(139,92,246,0.12)" },
   { status: "em_contato",         label: "Em Contato",        color: "#80d7f8", bg: "rgba(128,215,248,0.12)" },
   { status: "link_enviado",       label: "Link Enviado",      color: "#3b82f6", bg: "rgba(59,130,246,0.12)" },
   { status: "link_15",            label: "Link -15%",         color: "#f59e0b", bg: "rgba(245,158,11,0.12)" },
