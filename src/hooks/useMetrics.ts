@@ -17,6 +17,35 @@ import {
 
 const TABLE = 'ancore_info_br_CRM'
 
+async function fetchAllRows(from: string, to: string, productFilter: string | null): Promise<CRMRow[]> {
+  const PAGE_SIZE = 1000
+  let allRows: CRMRow[] = []
+  let page = 0
+
+  while (true) {
+    let q = supabase
+      .from(TABLE)
+      .select('id, created_at, "Event", utm_source, status, "($)"')
+      .gte('created_at', from)
+      .lte('created_at', to)
+      .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
+
+    if (productFilter) q = q.eq('product', productFilter)
+
+    const { data, error } = await q
+
+    if (error) throw error
+    if (!data || data.length === 0) break
+
+    allRows = allRows.concat(data as CRMRow[])
+
+    if (data.length < PAGE_SIZE) break
+    page++
+  }
+
+  return allRows
+}
+
 export interface DashboardMetrics {
   carrinhosAbandonados: number
   taxaResposta: number
@@ -59,19 +88,9 @@ export function useMetrics() {
 
         const productFilter = product && product !== 'Todos' ? product : null
 
-        let q = supabase
-          .from(TABLE)
-          .select('id, created_at, "Event", utm_source, status, "($)"')
-          .gte('created_at', from)
-          .lte('created_at', to)
-        if (productFilter) q = q.eq('product', productFilter)
+        const rows = await fetchAllRows(from, to, productFilter)
 
-        const rowsRes = await q
-
-        if ((rowsRes as any).error) throw (rowsRes as any).error
         if (cancelled) return
-
-        const rows = ((rowsRes as any).data ?? []) as CRMRow[]
 
         const carrinhosAbandonados = calcAbandonedCarts(rows)
         const taxaResposta = calcResponseRate(rows)
