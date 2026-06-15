@@ -90,7 +90,7 @@ function DashboardPage() {
             variant="brand2"
             loading={loading}
             value={formatCurrency(m.comissaoLumix)}
-            subInfo="10% sobre o valor recuperado"
+            subInfo="20% sobre o valor recuperado"
           />
           <MetricCard
             label="Faturamento Sob o Front"

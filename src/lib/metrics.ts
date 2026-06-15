@@ -1,4 +1,4 @@
-export const COMMISSION_RATE = 0.10
+export const COMMISSION_RATE = 0.20
 
 export interface CRMRow {
   created_at?: string
@@ -12,32 +12,27 @@ export interface CRMRow {
   status?: string | null
 }
 
-function parseNum(val: any): number {
-  if (val === null || val === undefined || val === '') return 0
-  if (typeof val === 'number') return isNaN(val) ? 0 : val
-  let s = String(val).replace(/[^0-9.,\-]/g, '')
-  if (s.includes(',')) {
-    s = s.replace(/\./g, '').replace(',', '.')
-  }
-  const n = parseFloat(s)
-  return isNaN(n) ? 0 : n
-}
+const isAbandoned = (r: CRMRow) => r.Event === 'abandoned_cart'
+const isPaid = (r: CRMRow) => r.Event === 'order_paid'
+const isWPP = (r: CRMRow) => r.utm_source?.includes('WPP') ?? false
+const isFront = (r: CRMRow) => !isWPP(r)
+const toValue = (r: CRMRow) => parseFloat(String(r['($)'] ?? '0')) || 0
 
 export function calcAbandonedCarts(rows: CRMRow[]): number {
-  return rows.filter((r) => r.Event === 'abandoned_cart').length
+  return rows.filter(isAbandoned).length
 }
 
 export function calcResponseRate(rows: CRMRow[]): number {
-  const disparos = rows.filter(
-    (r) => r.Event === 'abandoned_cart' && r.status !== null && r.status !== '' && r.status !== undefined,
-  )
-  if (!disparos.length) return 0
-  const responderam = disparos.filter((r) => r.status !== 'primeiro_contato')
-  return (responderam.length / disparos.length) * 100
+  const carrinhos = rows.filter(isAbandoned).length
+  if (!carrinhos) return 0
+  const responderam = rows.filter(
+    (r) => isAbandoned(r) && !!r.status && r.status !== 'primeiro_contato',
+  ).length
+  return (responderam / carrinhos) * 100
 }
 
 export function calcRecoveredSales(rows: CRMRow[]): number {
-  return rows.filter((r) => r.Event === 'order_paid' && (r.utm_source?.toUpperCase().includes('WPP') ?? false)).length
+  return rows.filter((r) => isPaid(r) && isWPP(r)).length
 }
 
 export function calcConversionRate(recoveredSales: number, abandonedCarts: number): number {
@@ -46,16 +41,16 @@ export function calcConversionRate(recoveredSales: number, abandonedCarts: numbe
 }
 
 export function calcTicketMedio(rows: CRMRow[]): number {
-  const wppSales = rows.filter((r) => r.Event === 'order_paid' && (r.utm_source?.toUpperCase().includes('WPP') ?? false))
+  const wppSales = rows.filter((r) => isPaid(r) && isWPP(r))
   if (!wppSales.length) return 0
-  const total = wppSales.reduce((acc, r) => acc + parseNum(r['($)']), 0)
+  const total = wppSales.reduce((acc, r) => acc + toValue(r), 0)
   return total / wppSales.length
 }
 
 export function calcValorRecuperado(rows: CRMRow[]): number {
   return rows
-    .filter((r) => r.Event === 'order_paid' && (r.utm_source?.toUpperCase().includes('WPP') ?? false))
-    .reduce((acc, r) => acc + parseNum(r['($)']), 0)
+    .filter((r) => isPaid(r) && isWPP(r))
+    .reduce((acc, r) => acc + toValue(r), 0)
 }
 
 export function calcComissaoLumix(valorRecuperado: number): number {
@@ -64,16 +59,11 @@ export function calcComissaoLumix(valorRecuperado: number): number {
 
 export function calcFaturamentoFront(rows: CRMRow[]): number {
   return rows
-    .filter(
-      (r) =>
-        r.Event === 'order_paid' &&
-        !(r.utm_source?.toUpperCase().includes('WPP') ?? false),
-    )
-    .reduce((acc, r) => acc + parseNum(r['($)']), 0)
+    .filter((r) => isPaid(r) && isFront(r))
+    .reduce((acc, r) => acc + toValue(r), 0)
 }
 
 export function calcFaturamentoSobFront(valorRecuperado: number, faturamentoFront: number): number {
-  const total = valorRecuperado + faturamentoFront
-  if (!total) return 0
-  return (valorRecuperado / total) * 100
+  if (!faturamentoFront) return 0
+  return (valorRecuperado / faturamentoFront) * 100
 }
